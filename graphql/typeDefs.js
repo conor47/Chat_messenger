@@ -1,17 +1,29 @@
-const {gql} = require('apollo-server')
+// file containing our graphql type definitions
 
-module.exports =  gql`
+const { gql } = require("apollo-server");
 
-# we define a new type , User, each of which contains a username and email, each of which are required
+module.exports = gql`
+  # we define a new type , User, each of which contains a username and email, each of which are required
 
-type User{
-    username:String!
-    email:String! 
-}
-
-# here we are specifying that this getUsers query must return an array, even if it's empty, of User only objects  
+  type User {
+    username: String!
+    email: String!
+  }
 
   type Query {
+    # here we are specifying that this getUsers query must return an array, even if it's empty, of User only objects
+
     getUsers: [User]!
+  }
+
+  type Mutation {
+    # we define a mutation for handling registrations
+
+    register(
+      username: String!
+      email: String!
+      password: String!
+      confirmPassword: String!
+    ): User!
   }
 `;

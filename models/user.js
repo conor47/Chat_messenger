@@ -1,12 +1,10 @@
-'use strict';
+"use strict";
 
 // this model was created via the sequelize cli using the command :
 // sequelize model:generate --name User --attributes username:string,email:string
 // That command generated this file
 
-const {
-  Model
-} = require('sequelize');
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -17,49 +15,62 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
-  };
+  }
 
   // two arguements are passed to the init fuction. The first is an object containing our field definitions. The second
   // is an object containing options for the model
 
-  User.init({
+  User.init(
+    {
+      // we define a new id column. We specify that it is an integer of 11 digits, non nullable, is set to autoincrement and
+      // is the primary key. Note this was not necessary as an id field is actually defined in the migrations.
 
+      // id : {
+      //   type : DataTypes.INTEGER(11),
+      //   allowNull : false,
+      //   autoIncrement : true,
+      //   primaryKey : true,
+      // },
 
+      // be default fields are nullable. Below we are specifying that username and email fields are non nullable and unique
 
-    // we define a new id column. We specify that it is an integer of 11 digits, non nullable, is set to autoincrement and
-    // is the primary key. Note this was not necessary as an id field is actually defined in the migrations.
+      username: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: {
+          isEmail: {
+            args: true,
+            msg: "Must be a valid email address",
+          },
+        },
+      },
 
-    // id : {
-    //   type : DataTypes.INTEGER(11),
-    //   allowNull : false,
-    //   autoIncrement : true,
-    //   primaryKey : true,
-    // },
+      // we add a field for passwords
 
-    // be default fields are nullable. Below we are specifying that username and email fields are non nullable and unique
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
 
-    username: {
-      type : DataTypes.STRING,
-      allowNull : false,
-      unique : true
+      // we add a field for user image urls. We will not be handling image uploads, just urls to existing images on
+      // the internet
+
+      imageURL: {
+        type: DataTypes.STRING,
+      },
     },
-    email: {
-      type : DataTypes.STRING,
-      allowNull : false,
-      unique : true
-    },
-    password :{
-        type : DataTypes.STRING ,
-        allowNull : false,
-    },
-    imageURL : {
-      type : DataTypes.STRING
+    {
+      sequelize,
+      modelName: "User",
+      // be default the table name will be Users but we can overwrite that
+      tableName: "users",
     }
-  }, {
-    sequelize,
-    modelName: 'User',
-    // be default the table name will be Users but we can overwrite that 
-    tableName : 'users'
-  });
+  );
   return User;
 };
