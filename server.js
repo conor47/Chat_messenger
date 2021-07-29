@@ -13,6 +13,9 @@ const typeDefs = require("./graphql/typeDefs");
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  // the context object gives us access to important meta data relating to each request made on our server
+  // this is necessary when modifying headers in request for performing user authentication etc
+  context: (ctx) => ctx,
 });
 
 server.listen().then(({ url }) => {

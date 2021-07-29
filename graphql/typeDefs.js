@@ -8,12 +8,15 @@ module.exports = gql`
   type User {
     username: String!
     email: String!
+    createdAt: String!
+    token: String
   }
 
   type Query {
     # here we are specifying that this getUsers query must return an array, even if it's empty, of User only objects
 
     getUsers: [User]!
+    login(username: String!, password: String!): User!
   }
 
   type Mutation {

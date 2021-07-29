@@ -43,6 +43,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
+        // here we use the validate key and supply validation rules as values. There are pre-defined validation rules
+        // provided by sequelize
         validate: {
           isEmail: {
             args: true,
