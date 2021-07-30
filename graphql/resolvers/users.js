@@ -2,8 +2,8 @@
 
 // we import the Users model
 
-const { User } = require("../models");
-const { JWT_SECRET } = require("../config/env.json");
+const { User } = require("../../models");
+const { JWT_SECRET } = require("../../config/env.json");
 
 // we use the bcrypt package for hashing the passwords
 
@@ -23,20 +23,9 @@ module.exports = {
     // we will be making using of the requst context to extract the jwt token stored in the http authorization
     // header. We will use to to verify the user making the request.
 
-    getUsers: async (_, __, context) => {
+    getUsers: async (_, __, { user }) => {
       try {
-        let user;
-
-        if (context.req && context.req.headers.authorization) {
-          const token = context.req.headers.authorization.split("Bearer ")[1];
-
-          jwt.verify(token, JWT_SECRET, (err, decodedToken) => {
-            if (err) {
-              throw new AuthenticationError("Unauthenticated");
-            }
-            user = decodedToken;
-          });
-        }
+        if (!user) throw new AuthenticationError("Unauthenticated");
 
         // here we are making use of sql operators , in this case not equal, to return all of the users not including
         // the user making the request.

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Row, Col, Form, Button } from "react-bootstrap";
 import { gql, useMutation } from "@apollo/client";
+import { Link } from "react-router-dom";
 
 // here we are defining our register mutation. We will pass this to our usemutation hook to send mutations to
 // out server
@@ -25,7 +26,7 @@ const REGISTER_USER = gql`
   }
 `;
 
-export default function Register() {
+export default function Register(props) {
   const [variables, setVariables] = useState({
     email: "",
     username: "",
@@ -39,13 +40,14 @@ export default function Register() {
   // are methods that will run over the lifecycle of the hook
 
   const [registerUser, { loading }] = useMutation(REGISTER_USER, {
-    update(_, res) {
-      console.log(res);
+    update(_, __) {
+      // after a successful registration we perform a redirect to the login page
+      props.history.push("/login");
     },
     onError(err) {
       // this is how we can access our errors returned by our server. This is due to how we structured our errors
       // on the server side
-      console.log(err.graphQLErrors[0].extensions.errors);
+
       setErrors(err.graphQLErrors[0].extensions.errors);
     },
   });
@@ -125,6 +127,10 @@ export default function Register() {
             <Button variant="success" type="submit" disabled={loading}>
               {loading ? "loading..." : "Register"}
             </Button>
+            <br />
+            <small>
+              Already have an account ?<Link to="/login">Login</Link>
+            </small>
           </div>
         </Form>
       </Col>
