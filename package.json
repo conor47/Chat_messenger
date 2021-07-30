@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "dev": " nodemon server.js"
+    "dev": " nodemon server.js --ignore client/"
   },
   "name": "chatapp_messenger",
   "version": "1.0.0",
