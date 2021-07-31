@@ -3,6 +3,8 @@ import { Row, Col, Form, Button } from "react-bootstrap";
 import { gql, useLazyQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
 
+import { useAuthDispatch } from "../context/auth";
+
 // here we are defining our register mutation. We will pass this to our usemutation hook to send mutations to
 // out server
 
@@ -25,6 +27,8 @@ export default function Register(props) {
 
   const [errors, setErrors] = useState({});
 
+  const dispatch = useAuthDispatch();
+
   // the useMutation hook takes a second parameter which is an object containing lifecycle methods. These
   // are methods that will run over the lifecycle of the hook
 
@@ -41,6 +45,7 @@ export default function Register(props) {
     },
     onCompleted(data) {
       localStorage.setItem("token", data.login.token);
+      dispatch({ type: "LOGIN", payload: data.login });
       props.history.push("/");
     },
   });
