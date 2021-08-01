@@ -13,6 +13,9 @@ const httpLink = createHttpLink({
   uri: "http://localhost:4000",
 });
 
+// this is like an intercepter for all of our requests. We are adding an authorization header to every HTTP request
+// Here we are pulling the login token from local storage for each request
+
 const authLink = setContext((_, { headers }) => {
   // get the authentication token from local storage if it exists
   const token = localStorage.getItem("token");

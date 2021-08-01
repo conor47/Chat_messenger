@@ -63,7 +63,7 @@ module.exports = (sequelize, DataTypes) => {
       // we add a field for user image urls. We will not be handling image uploads, just urls to existing images on
       // the internet
 
-      imageURL: {
+      imageUrl: {
         type: DataTypes.STRING,
       },
     },

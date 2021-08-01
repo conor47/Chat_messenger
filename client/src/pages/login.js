@@ -44,7 +44,6 @@ export default function Register(props) {
       setErrors(err.graphQLErrors[0].extensions.errors);
     },
     onCompleted(data) {
-      localStorage.setItem("token", data.login.token);
       dispatch({ type: "LOGIN", payload: data.login });
       props.history.push("/");
     },

@@ -11,7 +11,9 @@ export default function DynamicRoute(props) {
   const { user } = useAuthState();
 
   if (props.authenticated && !user) {
+    //   if there is no user we redirect to the login page
     return <Redirect to="/login" />;
+    // if there is a user we redirect to the home page. The logged in user cannot view the login or register pages
   } else if (props.guest && user) {
     return <Redirect to="/" />;
   } else {

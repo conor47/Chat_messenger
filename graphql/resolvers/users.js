@@ -2,7 +2,7 @@
 
 // we import the Users model
 
-const { User } = require("../../models");
+const { Message, User } = require("../../models");
 const { JWT_SECRET } = require("../../config/env.json");
 
 // we use the bcrypt package for hashing the passwords
@@ -30,9 +30,32 @@ module.exports = {
         // here we are making use of sql operators , in this case not equal, to return all of the users not including
         // the user making the request.
 
-        const users = await User.findAll({
+        let users = await User.findAll({
+          // here we are specifying the fields that we want to be returned form the query
+          attributes: ["username", "imageUrl", "createdAt"],
           where: { username: { [Op.ne]: user.username } },
         });
+
+        // here we are finding all of the messages that are either from the current user or to the current user
+        // and we are ordering them by createdAt in descending order
+
+        const allUserMessages = await Message.findAll({
+          where: {
+            [Op.or]: [{ from: user.username }, { to: user.username }],
+          },
+          order: [["createdAt", "DESC"]],
+        });
+
+        // here we are finding the latest message for each user
+
+        users = users.map((otherUser) => {
+          const latestMessage = allUserMessages.find(
+            (m) => m.from === otherUser.username || m.to === otherUser.username
+          );
+          otherUser.latestMessage = latestMessage;
+          return otherUser;
+        });
+
         return users;
       } catch (err) {
         console.log(err);
