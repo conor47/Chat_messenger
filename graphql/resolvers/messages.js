@@ -4,6 +4,10 @@
 
 const { User, Message } = require("../../models");
 const { Op } = require("sequelize");
+// we will use the pubsub class to create a pub sub subscription
+import { PubSub } from "graphql-subscriptions";
+
+const pubsub = new PubSub();
 
 const { UserInputError, AuthenticationError } = require("apollo-server");
 
@@ -69,11 +73,20 @@ module.exports = {
           content,
         });
 
+        pubsub.publish("NEW_MESSAGE", { newMessage: message });
+
         return message;
       } catch (err) {
         console.log(err);
         throw err;
       }
+    },
+    Subscription: {
+      newMessage: () => {
+        // we pass an arry of events. When one of these events occur they will pass information to the
+        // subscription. The subscription then passes that info to whoever is subscribed
+        pubsub.asyncIterator(["NEW_MESSAGE"]);
+      },
     },
   },
 };

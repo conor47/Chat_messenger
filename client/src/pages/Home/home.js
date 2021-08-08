@@ -11,6 +11,8 @@ export default function Home({ history }) {
   const dispatch = useAuthDispatch();
   const logout = () => {
     dispatch({ type: "LOGOUT" });
+    // now when we log out the entire app will be reloaded. This was an easy fix to the logout login and the
+    // users being displayed wrong issue
     window.location.href = "/login";
   };
 

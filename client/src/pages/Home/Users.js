@@ -57,7 +57,13 @@ function Users() {
             dispatch({ type: "SET_SELECTED_USER", payload: user.username })
           }
         >
-          <Image src={user.imageUrl} className="me-2 user-image" />
+          <Image
+            src={
+              user.imageUrl ||
+              "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+            }
+            className="me-2 user-image"
+          />
 
           {/* these classes are important for the responsiveness of the app. On small devices the text does not show  */}
           {/* on medium devices and up the text will show */}
