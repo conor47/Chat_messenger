@@ -1,7 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, Fragment } from "react";
 import { gql, useLazyQuery } from "@apollo/client";
 import { Col } from "react-bootstrap";
 import { useMessageState, useMessageDispatch } from "../../context/message";
+
+import Message from "./Message";
 
 const GET_MESSAGES = gql`
   query getMessages($from: String!) {
@@ -47,14 +49,27 @@ function Messages() {
   } else if (messagesLoading) {
     selectedChatMarkup = <p>Loading ...</p>;
   } else if (messages.length > 0) {
-    selectedChatMarkup = messages.map((message) => (
-      <p key={message.uuid}>{message.content}</p>
+    selectedChatMarkup = messages.map((message, index) => (
+      // we add a workaround to stop the margin of the last message collapsing with the margin of the parent.
+      // To do so we target this last child element and add an invisible div to this element.
+      <Fragment key={message.uuid}>
+        <Message message={message} />
+        {index === messages.length - 1 && (
+          <div className="invisible">
+            <hr className="m-0" />
+          </div>
+        )}
+      </Fragment>
     ));
   } else if (messages.length === 0) {
     selectedChatMarkup = <p>You are now connected! Send your first message</p>;
   }
 
-  return <Col xs={8}>{selectedChatMarkup}</Col>;
+  return (
+    <Col xs={10} md={8} className="messages-box d-flex flex-column-reverse">
+      {selectedChatMarkup}
+    </Col>
+  );
 }
 
 export default Messages;
