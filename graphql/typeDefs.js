@@ -21,6 +21,14 @@ module.exports = gql`
     createdAt: String!
   }
 
+  type Reaction {
+    uuid: String!
+    content: String!
+    createdAt: String!
+    Message: Message!
+    User: User!
+  }
+
   type Query {
     # here we are specifying that this getUsers query must return an array, even if it's empty, of User only objects
 
@@ -39,9 +47,11 @@ module.exports = gql`
       confirmPassword: String!
     ): User!
     sendMessage(to: String!, content: String!): Message!
+    reactToMessage(uuid: String!, content: String!): Reaction!
   }
 
   type Subscription {
     newMessage: Message!
+    newReaction: Reaction!
   }
 `;
