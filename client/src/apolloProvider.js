@@ -5,11 +5,14 @@ import {
   InMemoryCache,
   ApolloProvider as Provider,
   createHttpLink,
+  split,
 } from "@apollo/client";
 
 import { setContext } from "@apollo/client/link/context";
+import { WebSocketLink } from "@apollo/client/link/ws";
+import { getMainDefinition } from "@apollo/client/utilities";
 
-const httpLink = createHttpLink({
+let httpLink = createHttpLink({
   uri: "http://localhost:4000",
 });
 
@@ -28,10 +31,39 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-// is a comprehensive state management library for JavaScript that enables you to manage both local and remote data with GraphQL. Use it to fetch, cache, and modify application data, all while automatically updating your UI.
+// initialising a webSocket link can be seen in the Apollo docs. These next code blocks are responsible
+// for that
+
+httpLink = authLink.concat(httpLink);
+
+const wsLink = new WebSocketLink({
+  uri: `ws://localhost:4000/graphql`,
+  options: {
+    reconnect: true,
+    connectionParams: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  },
+});
+
+// split is a function that checks if the incomming request is a query or mutation or a subscription.
+// If its a query or mutation then we use the httpLink. If its a subscription then we use the
+// Web socket link
+
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === "OperationDefinition" &&
+      definition.operation === "subscription"
+    );
+  },
+  wsLink,
+  httpLink
+);
 
 const client = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: splitLink,
   cache: new InMemoryCache(),
 });
 

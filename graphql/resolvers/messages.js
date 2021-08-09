@@ -5,11 +5,12 @@
 const { User, Message } = require("../../models");
 const { Op } = require("sequelize");
 // we will use the pubsub class to create a pub sub subscription
-import { PubSub } from "graphql-subscriptions";
 
-const pubsub = new PubSub();
-
-const { UserInputError, AuthenticationError } = require("apollo-server");
+const {
+  UserInputError,
+  AuthenticationError,
+  withFilter,
+} = require("apollo-server");
 
 module.exports = {
   Query: {
@@ -46,7 +47,7 @@ module.exports = {
     },
   },
   Mutation: {
-    sendMessage: async (parent, { to, content }, { user }) => {
+    sendMessage: async (parent, { to, content }, { user, pubsub }) => {
       try {
         if (!user) throw new AuthenticationError("Unauthenticated");
         // once we pass here we know the user is a valid user / has a valid token
@@ -81,12 +82,29 @@ module.exports = {
         throw err;
       }
     },
-    Subscription: {
-      newMessage: () => {
-        // we pass an arry of events. When one of these events occur they will pass information to the
-        // subscription. The subscription then passes that info to whoever is subscribed
-        pubsub.asyncIterator(["NEW_MESSAGE"]);
-      },
+  },
+  Subscription: {
+    newMessage: {
+      // we wrap our resolver in a filter. The first arguement to the filter is the resolver. The second arguement
+      // is a filter function. We will use this to return messages to a user that are from him or to him.
+      // we do not want users to be able to access all messages
+      subscribe: withFilter(
+        (_, __, { pubsub, user }) => {
+          // we pass an arry of even,ts. When one of these events occur they will pass information to the
+          // subscription. The subscription then passes that info to whoever is subscribed
+          if (!user) throw new AuthenticationError("Unauthenticated");
+          return pubsub.asyncIterator(["NEW_MESSAGE"]);
+        },
+        ({ newMessage }, _, { user }) => {
+          if (
+            newMessage.from === user.username ||
+            newMessage.to === user.username
+          ) {
+            return true;
+          }
+          return false;
+        }
+      ),
     },
   },
 };
