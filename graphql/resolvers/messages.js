@@ -39,6 +39,7 @@ module.exports = {
           //   order is an array or arrays where each array represents a key in the ordering. Here we are specifying that we
           // want to order the results by cratedAt in descending order
           order: [["createdAt", "DESC"]],
+          include: [{ model: Reaction, as: "reactions" }],
         });
         return messages;
       } catch (err) {

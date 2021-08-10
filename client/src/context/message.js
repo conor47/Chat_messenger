@@ -5,7 +5,7 @@ const MessageDispatchContext = createContext();
 
 const messageReducer = (state, action) => {
   let usersCopy, userIndex;
-  const { username, message, messages } = action.payload;
+  const { username, message, messages, reaction } = action.payload;
   switch (action.type) {
     case "SET_USERS":
       return { ...state, users: action.payload };
@@ -35,6 +35,8 @@ const messageReducer = (state, action) => {
       usersCopy = [...state.users];
       userIndex = usersCopy.findIndex((user) => user.username === username);
 
+      message.reactions = [];
+
       let newUser = {
         ...usersCopy[userIndex],
         messages: usersCopy[userIndex].messages
@@ -44,6 +46,47 @@ const messageReducer = (state, action) => {
       };
 
       usersCopy[userIndex] = newUser;
+
+      return {
+        ...state,
+        users: usersCopy,
+      };
+
+    case "ADD_REACTION":
+      usersCopy = [...state.users];
+      userIndex = usersCopy.findIndex((user) => user.username === username);
+      // make a shallow copy of user
+      let userCopy = { ...usersCopy[userIndex] };
+
+      const messageIndex = userCopy.messages?.findIndex(
+        (m) => message.uuid === reaction.message.uuid
+      );
+
+      if (messageIndex > -1) {
+        let messagesCopy = [...userCopy.messages];
+
+        let reactionsCopy = [...messagesCopy[messageIndex].reactions];
+
+        const reactionIndex = reactionsCopy.findIndex(
+          (r) => r.uuid === reaction.uuid
+        );
+
+        // reaction exists , update it
+        if (reactionIndex > -1) {
+          reactionsCopy[reactionIndex] = reaction;
+          // reaction does not exist, add it
+        } else {
+          reactionsCopy = [...reactionsCopy, reaction];
+        }
+
+        messagesCopy[messageIndex] = {
+          ...messagesCopy[messageIndex],
+          reactions: reactionsCopy,
+        };
+
+        userCopy = { ...userCopy, messages: messagesCopy };
+        usersCopy[userIndex] = userCopy;
+      }
 
       return {
         ...state,
