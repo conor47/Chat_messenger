@@ -2,21 +2,20 @@
 
 // we import the Users model
 
-const { Message, User } = require("../../models");
-const { JWT_SECRET } = require("../../config/env.json");
+const { Message, User } = require('../../models');
 
 // we use the bcrypt package for hashing the passwords
 
-const bcrypt = require("bcryptjs");
+const bcrypt = require('bcryptjs');
 
 // we will use jsonwebtokens for user authentication
 
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 
 // we are importing sql operators. Sequelize provides a wrapper for these operators
-const { Op } = require("sequelize");
+const { Op } = require('sequelize');
 
-const { UserInputError, AuthenticationError } = require("apollo-server");
+const { UserInputError, AuthenticationError } = require('apollo-server');
 
 module.exports = {
   Query: {
@@ -25,14 +24,14 @@ module.exports = {
 
     getUsers: async (_, __, { user }) => {
       try {
-        if (!user) throw new AuthenticationError("Unauthenticated");
+        if (!user) throw new AuthenticationError('Unauthenticated');
 
         // here we are making use of sql operators , in this case not equal, to return all of the users not including
         // the user making the request.
 
         let users = await User.findAll({
           // here we are specifying the fields that we want to be returned form the query
-          attributes: ["username", "imageUrl", "createdAt"],
+          attributes: ['username', 'imageUrl', 'createdAt'],
           where: { username: { [Op.ne]: user.username } },
         });
 
@@ -43,7 +42,7 @@ module.exports = {
           where: {
             [Op.or]: [{ from: user.username }, { to: user.username }],
           },
-          order: [["createdAt", "DESC"]],
+          order: [['createdAt', 'DESC']],
         });
 
         // here we are finding the latest message for each user
@@ -69,12 +68,12 @@ module.exports = {
       const { username, password } = args;
       let errors = {};
       try {
-        if (username.trim() === "")
-          errors.username = "username must not be empty";
-        if (password === "") errors.username = "password must not be empty";
+        if (username.trim() === '')
+          errors.username = 'username must not be empty';
+        if (password === '') errors.username = 'password must not be empty';
 
         if (Object.keys(errors).length > 0) {
-          throw new UserInputError("bad input", { errors });
+          throw new UserInputError('bad input', { errors });
         }
 
         const user = await User.findOne({
@@ -82,15 +81,15 @@ module.exports = {
         });
 
         if (!user) {
-          errors.username = "User not found";
-          throw new UserInputError("user not found", { errors });
+          errors.username = 'User not found';
+          throw new UserInputError('user not found', { errors });
         }
 
         const correctPassword = await bcrypt.compare(password, user.password);
 
         if (!correctPassword) {
-          errors.password = "Password is incorrect";
-          throw new AuthenticationError("Password is incorrect", { errors });
+          errors.password = 'Password is incorrect';
+          throw new AuthenticationError('Password is incorrect', { errors });
         }
 
         // if we reach this point then the user is valid and will be logged in. We need to issue a jsonwebtoke
@@ -100,7 +99,7 @@ module.exports = {
           {
             username,
           },
-          JWT_SECRET,
+          process.env.JWT_SECRET,
           { expiresIn: 60 * 60 }
         );
 
@@ -129,16 +128,16 @@ module.exports = {
 
         // we perform some crude input validation
 
-        if (email.trim() === "") errors.email = "Email must not be empty";
-        if (username.trim() === "")
-          errors.username = "Username must not be empty";
-        if (password.trim() === "")
-          errors.password = "Password must not be empty";
-        if (confirmPassword.trim() === "")
-          errors.confirmPassword = "Confirm Password must not be empty";
+        if (email.trim() === '') errors.email = 'Email must not be empty';
+        if (username.trim() === '')
+          errors.username = 'Username must not be empty';
+        if (password.trim() === '')
+          errors.password = 'Password must not be empty';
+        if (confirmPassword.trim() === '')
+          errors.confirmPassword = 'Confirm Password must not be empty';
 
         if (password !== confirmPassword)
-          errors.confirmPassword = "Passwords must match";
+          errors.confirmPassword = 'Passwords must match';
 
         // TODO Check if username / email exists
 
@@ -186,17 +185,17 @@ module.exports = {
         // the error checking for unique username and emails is now done here. If the User.create() method above throws
         // a UniqueConstraintError we handle it below
 
-        if (err.name === "SequelizeUniqueConstraintError") {
+        if (err.name === 'SequelizeUniqueConstraintError') {
           err.errors.forEach(
             (e) =>
               (errors[e.path.substr(6)] = `${e.path.substr(
                 6
               )} is already taken`)
           );
-        } else if (err.name === "SequelizeValidationError") {
+        } else if (err.name === 'SequelizeValidationError') {
           err.errors.forEach((e) => (errors[e.path] = e.message));
         }
-        throw new UserInputError("Bad Input", { errors });
+        throw new UserInputError('Bad Input', { errors });
       }
     },
   },
