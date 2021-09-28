@@ -7,16 +7,11 @@ $green: #36a420;
 $border-radius: 0;
 $paragraph-margin-bottom: 0;
 $gray-600: rgb(245, 245, 245);
-@import "~bootstrap/scss/bootstrap";
+@import '~bootstrap/scss/bootstrap';
 
 body {
   min-height: 100vh;
-  background: linear-gradient(
-    203deg,
-    rgba(131, 58, 180, 0.9) 0%,
-    rgba(253, 29, 29, 0.9) 50%,
-    rgba(252, 176, 69, 0.9) 100%
-  );
+  background: #020c1b;
 }
 
 .user-div:hover {
