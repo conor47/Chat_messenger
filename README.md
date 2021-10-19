@@ -7,7 +7,7 @@ Core features account creation, sending messages and reacting to messages.
 
 ## View live
 
-This project is hosted on a digital ocean kubernetes cluster, viewable [here](http://www.conor-microservice-prod.xyz/)
+This project is hosted on a digital ocean kubernetes cluster, viewable [here](http://34.243.211.119/login)
 	
 ## Technologies
 Project is created with:
