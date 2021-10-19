@@ -1,6 +1,6 @@
 ## General info
 A full stack real time chat application.
-Core features account creation, sending messages and reacting to messages.
+Core features account creation, sending messages.
 * Frontend is built using React styled using Boostrap 5. 
 * Backend services built using Node and Express and GraphQL. Data persistence using MySQL.
 * Deployed in on an AWS EC2 instance. Datbase is deployed on an AWS MySQL instance.
